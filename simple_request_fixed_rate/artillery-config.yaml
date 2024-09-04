@@ -1,0 +1,17 @@
+config:
+  target: http://localhost:8080
+  phases:
+    - duration: 40
+      arrivalRate: 700
+      name: Steady state
+      maxVusers: 30
+  plugins:
+    apdex: {}
+  apdex:
+    threshold: 100
+scenarios:
+  - flow:
+      - loop:
+          - get:
+              url: '/time/cached'
+        count: 1

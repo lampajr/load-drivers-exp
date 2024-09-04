@@ -1,0 +1,5 @@
+**/*.log
+**/results/jmeter/*
+**/results/k6/*
+**/results/hyperfoil/*
+**/results/artillery/*

@@ -1,0 +1,3 @@
+[submodule "quarkus-profiling-workshop"]
+	path = quarkus-profiling-workshop
+	url = git@github.com:franz1981/quarkus-profiling-workshop.git
