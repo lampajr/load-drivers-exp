@@ -7,7 +7,7 @@ CURRENT_DIR=$(dirname $0)
 #### overridable configuration ####
 ###################################
 
-TEST_CASE=${TEST_CASE:-"simple_request_fixed_rate"}
+TEST_CASE=${TEST_CASE:-"simple_request_700_rps"}
 FULL_URL=${FULL_URL:-"http://localhost:8080/time/cached"}
 
 THREADS=${THREADS:-10}
@@ -57,14 +57,17 @@ k6_pid=$!
 ${ARTILLERY} run $TEST_CASE_FOLDER/artillery-config.yaml -o $TEST_CASE_RESULTS_FOLDER/artillery/artillery-report.json &> "$TEST_CASE_RESULTS_FOLDER/artillery/artillery.log" &
 artillery_pid=$!
 
-sleep $WARMUP_BEFORE_PAUSE
-
 # suspend the server
-echo "----- Suspending the server simulating a severe stall server-side"
-kill -STOP $quarkus_pid
-sleep $SERVER_PAUSE_DURATION
-echo "----- Resuming the server"
-kill -CONT $quarkus_pid
+if [ ! "$SERVER_PAUSE_DURATION" -eq "0" ]; then
+    sleep $WARMUP_BEFORE_PAUSE
+
+    echo "----- Suspending the server simulating a severe stall server-side"
+    kill -STOP $quarkus_pid
+    sleep $SERVER_PAUSE_DURATION
+    echo "----- Resuming the server"
+    kill -CONT $quarkus_pid
+fi
+
 
 wait $wrk_pid
 wait $k6_pid
