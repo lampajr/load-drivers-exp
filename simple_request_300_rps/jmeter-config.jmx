@@ -10,7 +10,7 @@
     </TestPlan>
     <hashTree>
       <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Open Model Users">
-        <stringProp name="OpenModelThreadGroup.schedule">rate(700/sec) random_arrivals(40 sec) rate(700/sec)</stringProp>
+        <stringProp name="OpenModelThreadGroup.schedule">rate(300/sec) random_arrivals(40 sec) rate(300/sec)</stringProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="OpenModelThreadGroupController"/>
       </OpenModelThreadGroup>

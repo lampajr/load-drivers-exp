@@ -2,7 +2,7 @@ config:
   target: http://localhost:8080
   phases:
     - duration: 40
-      arrivalRate: 700
+      arrivalRate: 300
       name: Steady state
       maxVusers: 30
   plugins:

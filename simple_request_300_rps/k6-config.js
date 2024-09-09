@@ -10,7 +10,7 @@ export const options = {
       duration: '40s',
 
       // How many iterations per timeUnit
-      rate: 700,
+      rate: 300,
 
       // Start `rate` iterations per second
       timeUnit: '1s',

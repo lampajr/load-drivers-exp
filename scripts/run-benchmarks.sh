@@ -7,11 +7,11 @@ CURRENT_DIR=$(dirname $0)
 #### overridable configuration ####
 ###################################
 
-TEST_CASE=${TEST_CASE:-"simple_request_700_rps"}
+TEST_CASE=${TEST_CASE:-"simple_request_300_rps"}
 FULL_URL=${FULL_URL:-"http://localhost:8080/time/cached"}
 
 THREADS=${THREADS:-10}
-RATE=${RATE:-700}
+RATE=${RATE:-300}
 DURATION=${DURATION:-40}
 CONNECTIONS=${CONNECTIONS:-30}
 
