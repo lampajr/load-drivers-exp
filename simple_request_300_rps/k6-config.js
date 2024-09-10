@@ -15,11 +15,11 @@ export const options = {
       // Start `rate` iterations per second
       timeUnit: '1s',
 
-      // Pre-allocate 2 VUs before starting the test
-      preAllocatedVUs: 30,
+      // // Pre-allocate 2 VUs before starting the test
+      preAllocatedVUs: 2,
 
-      // Spin up a maximum of 30 VUs to sustain the defined
-      // constant arrival rate.
+      // // Spin up a maximum of 30 VUs to sustain the defined
+      // // constant arrival rate.
       maxVUs: 30,
     },
   },
