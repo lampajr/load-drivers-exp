@@ -8,12 +8,8 @@ CURRENT_DIR=$(dirname $0)
 ###################################
 
 TEST_CASE=${TEST_CASE:-"simple_request_300_rps"}
-FULL_URL=${FULL_URL:-"http://localhost:8080/time/cached"}
 
 THREADS=${THREADS:-10}
-RATE=${RATE:-300}
-DURATION=${DURATION:-40}
-CONNECTIONS=${CONNECTIONS:-30}
 
 WARMUP_BEFORE_PAUSE=${WARMUP_BEFORE_PAUSE:-20}
 SERVER_PAUSE_DURATION=${SERVER_PAUSE_DURATION:-7}
@@ -43,10 +39,11 @@ trap "echo 'cleaning up quarkus process';kill ${quarkus_pid}" SIGINT SIGTERM SIG
 
 sleep 2
 
-echo "----- Start fixed rate test at ${RATE} requests/sec"
+echo "----- Start test $(basename ${TEST_CASE_FOLDER})"
 
 # hyperfoil
 mkdir -p "$TEST_CASE_RESULTS_FOLDER/hyperfoil"
+source $TEST_CASE_FOLDER/hf-config.env
 ${HF} -R ${RATE} -c ${CONNECTIONS} -t ${THREADS} -d ${DURATION}s --latency ${FULL_URL} &> "$TEST_CASE_RESULTS_FOLDER/hyperfoil/hf.log" &
 wrk_pid=$!
 
@@ -77,6 +74,7 @@ if [ ! "$SERVER_PAUSE_DURATION" -eq "0" ]; then
 fi
 
 
+echo "----- Waiting for the workload to complete"
 wait $wrk_pid
 wait $k6_pid
 wait $artillery_pid
