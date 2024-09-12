@@ -31,7 +31,10 @@ ARTILLERY=${ARTILLERY:-"artillery"}
 
 
 TEST_CASE_FOLDER="$CURRENT_DIR/../$TEST_CASE"
-TEST_CASE_RESULTS_FOLDER="$TEST_CASE_FOLDER/results"
+
+# create the results folder
+TEST_CASE_RESULTS_FOLDER="$CURRENT_DIR/../results/$TEST_CASE/$(date '+%d%m%Y_%H%M%S')/"
+mkdir -p "$TEST_CASE_RESULTS_FOLDER"
 
 java -Dquarkus.vertx.event-loops-pool-size=${THREADS} -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar $CURRENT_DIR/../quarkus-profiling-workshop/target/quarkus-app/quarkus-run.jar &
 quarkus_pid=$!
@@ -43,17 +46,22 @@ sleep 2
 echo "----- Start fixed rate test at ${RATE} requests/sec"
 
 # hyperfoil
+mkdir -p "$TEST_CASE_RESULTS_FOLDER/hyperfoil"
 ${HF} -R ${RATE} -c ${CONNECTIONS} -t ${THREADS} -d ${DURATION}s --latency ${FULL_URL} &> "$TEST_CASE_RESULTS_FOLDER/hyperfoil/hf.log" &
 wrk_pid=$!
 
 # jmeter
+mkdir -p "$TEST_CASE_RESULTS_FOLDER/jmeter"
 ${JMETER} -n -t $TEST_CASE_FOLDER/jmeter-config.jmx -l $TEST_CASE_RESULTS_FOLDER/jmeter/log.jtl -j $TEST_CASE_RESULTS_FOLDER/jmeter/jmeter.log -e -o $TEST_CASE_RESULTS_FOLDER/jmeter/jmeter-report -f >/dev/null &
 jmeter_pid=$!
 
 # k6
+mkdir -p "$TEST_CASE_RESULTS_FOLDER/k6"
 ${K6} run --summary-trend-stats="avg,min,med,max,p(50),p(75),p(90),p(99),p(99.9),p(99.99),p(99.999),count" --out json=$TEST_CASE_RESULTS_FOLDER/k6/k6-output.json $TEST_CASE_FOLDER/k6-config.js &> "$TEST_CASE_RESULTS_FOLDER/k6/k6.log" &
 k6_pid=$!
 
+# artillery
+mkdir -p "$TEST_CASE_RESULTS_FOLDER/artillery"
 ${ARTILLERY} run $TEST_CASE_FOLDER/artillery-config.yaml -o $TEST_CASE_RESULTS_FOLDER/artillery/artillery-report.json &> "$TEST_CASE_RESULTS_FOLDER/artillery/artillery.log" &
 artillery_pid=$!
 
