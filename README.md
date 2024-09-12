@@ -10,6 +10,11 @@ If you want to run the complete automated test, simply run:
 ./scripts/run-benchmarks.sh
 ```
 
+You can also skip some load generators:
+```bash
+ARTILLERY_ENABLED=false K6_ENABLED=false HF_ENABLED=true JMETER_ENABLED=true ./run-benchmarks.sh
+```
+
 > [!NOTE]
 > You need to satisfy all [prerequisites](#prerequisites), otherwise the script might fail.
 
