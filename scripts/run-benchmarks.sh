@@ -10,6 +10,9 @@ CURRENT_DIR=$(dirname $0)
 TEST_CASE=${TEST_CASE:-"simple_request_100_rps"}
 
 THREADS=${THREADS:-10}
+QUARKUS_BACKLOG=${QUARKUS_BACKLOG:-"-1"}
+QUARKUS_CONNECTIONS=${QUARKUS_CONNECTIONS:-"100"}
+QUARKUS_IDLE_TIMEOUT=${QUARKUS_IDLE_TIMEOUT:-"30M"}
 
 WARMUP_BEFORE_PAUSE=${WARMUP_BEFORE_PAUSE:-20}
 SERVER_PAUSE_DURATION=${SERVER_PAUSE_DURATION:-7}
@@ -37,7 +40,7 @@ TEST_CASE_FOLDER="$CURRENT_DIR/../$TEST_CASE"
 TEST_CASE_RESULTS_FOLDER="$CURRENT_DIR/../results/$TEST_CASE/$(date '+%d%m%Y_%H%M%S')/"
 mkdir -p "$TEST_CASE_RESULTS_FOLDER"
 
-java -Dquarkus.vertx.event-loops-pool-size=${THREADS} -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar $CURRENT_DIR/../quarkus-profiling-workshop/target/quarkus-app/quarkus-run.jar &
+java -Dquarkus.log.level=INFO -Dquarkus.vertx.event-loops-pool-size=${THREADS} -Dquarkus.http.idle-timeout=${QUARKUS_IDLE_TIMEOUT} -Dquarkus.http.accept-backlog=${QUARKUS_BACKLOG} -Dquarkus.http.limits.max-connections=${QUARKUS_CONNECTIONS} -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar $CURRENT_DIR/../quarkus-profiling-workshop/target/quarkus-app/quarkus-run.jar &
 quarkus_pid=$!
 
 trap "echo 'cleaning up quarkus process';kill ${quarkus_pid}" SIGINT SIGTERM SIGKILL
