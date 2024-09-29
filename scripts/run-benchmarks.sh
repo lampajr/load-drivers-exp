@@ -40,7 +40,7 @@ TEST_CASE_FOLDER="$CURRENT_DIR/../$TEST_CASE"
 TEST_CASE_RESULTS_FOLDER="$CURRENT_DIR/../results/$TEST_CASE/$(date '+%d%m%Y_%H%M%S')/"
 mkdir -p "$TEST_CASE_RESULTS_FOLDER"
 
-java -Dquarkus.log.level=INFO -Dquarkus.vertx.event-loops-pool-size=${THREADS} -Dquarkus.http.idle-timeout=${QUARKUS_IDLE_TIMEOUT} -Dquarkus.http.accept-backlog=${QUARKUS_BACKLOG} -Dquarkus.http.limits.max-connections=${QUARKUS_CONNECTIONS} -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar $CURRENT_DIR/../quarkus-profiling-workshop/target/quarkus-app/quarkus-run.jar &
+java -Djava.net.preferIPv4Stack=true -Dquarkus.log.level=INFO -Dquarkus.vertx.event-loops-pool-size=${THREADS} -Dquarkus.http.idle-timeout=${QUARKUS_IDLE_TIMEOUT} -Dquarkus.http.accept-backlog=${QUARKUS_BACKLOG} -Dquarkus.http.limits.max-connections=${QUARKUS_CONNECTIONS} -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -jar $CURRENT_DIR/../quarkus-profiling-workshop/target/quarkus-app/quarkus-run.jar &
 quarkus_pid=$!
 
 trap "echo 'cleaning up quarkus process';kill ${quarkus_pid}" SIGINT SIGTERM SIGKILL
