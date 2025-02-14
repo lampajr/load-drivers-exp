@@ -1,0 +1,79 @@
+scripts:
+
+  ### interface ###
+
+  setup-sut:
+  - script: clone-sut
+  - script: build-sut
+  - script: start-sut
+
+  pause-sut:
+  - read-state: ${{RUN.SUT_PID}}
+    then:
+    - js: ${{SUT_PAUSE_DURATION}} > 0
+      then:
+      - sh: sleep ${{SUT_PAUSE_BEFORE_DURATION:0}} && kill -STOP ${{RUN.SUT_PID}}
+      - log: SUT paused!
+      - sh: sleep ${{SUT_PAUSE_DURATION}} && kill -CONT ${{RUN.SUT_PID}}
+      - log: SUT resumed!
+    else:
+    - abort: SUT pid is not set!
+
+  cleanup-sut:
+  - script: kill-sut
+
+  ### implementations ###
+
+  start-sut:
+  - script: sdk-select-java
+    with:
+      JAVA_VERSION: ${{SUT_JAVA_VERSION}}
+  - queue-download: ${{SUT_RUN_LOG}}
+  # TODO: run on some specific cores, e.g., using `taskset -c <cores> <cmd>`
+  # nohup is required to ensure the java process is not killed when closing the ssh session
+  - sh: nohup java ${{SUT_JAVA_OPTIONS}} -jar ${{SUT_BUILD_FOLDER}}/target/hello-world-app-1.0.0-SNAPSHOT-runner.jar > ${{SUT_RUN_LOG}} 2>&1 & export QUARKUS_PID="$!"
+  - sh: echo ${QUARKUS_PID}
+    then:
+    - set-state: RUN.SUT_PID
+  - sh: tail -f ${{SUT_RUN_LOG}}
+    silent: true
+    watch:
+    - regex: started in.*Listening on
+      then:
+      - ctrlC
+      - signal: SUT_STARTED
+
+  clone-sut:
+  # clone the repository and checkout the proper commit/branch
+  - sh: if [ -d ${{SUT_BUILD_FOLDER}} ]; then rm -rf ${{SUT_BUILD_FOLDER}}; fi 
+  - sh: git clone --depth 1 ${{SUT_REPO}} ${{SUT_BUILD_FOLDER}}
+  - sh: cd ${{SUT_BUILD_FOLDER}} && git fetch --depth 1 origin ${{SUT_COMMIT:main}} && git checkout ${{SUT_COMMIT:main}}
+
+  build-sut:
+  - sh: if [ -f ${{SUT_BUILD_LOG}} ]; then rm -f ${{SUT_BUILD_LOG}}; fi
+  - queue-download: ${{SUT_BUILD_LOG}}
+  - script: sdk-select-java
+    with:
+      JAVA_VERSION: ${{SUT_JAVA_VERSION}}
+  - sh: cd ${{SUT_BUILD_FOLDER}} && ./mvnw clean package -Dquarkus.package.type=uber-jar | tee ${{SUT_BUILD_LOG}}
+
+  kill-sut:
+  - read-state: ${{RUN.SUT_PID}}
+    then:
+    - log: killing process ${{RUN.SUT_PID}}
+    - sh: ps --pid ${{RUN.SUT_PID}} -o cmd=
+    - sh: kill -9 ${{RUN.SUT_PID}} 
+
+states:
+  SUT_REPO: https://github.com/franz1981/quarkus-profiling-workshop.git
+  SUT_COMMIT: master
+  SUT_BUILD_FOLDER: /tmp/build-quarkus-profiling-workshop
+  SUT_BUILD_LOG: /tmp/sut_build.log
+
+  SUT_JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true -Dquarkus.log.level=INFO -Dquarkus.vertx.event-loops-pool-size=10 -Dquarkus.http.idle-timeout=30M -Dquarkus.http.accept-backlog=-1 -Dquarkus.http.limits.max-connections=100 -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints
+  SUT_JAVA_VERSION: 21.0.5-tem
+
+  SUT_RUN_LOG: /tmp/sut_run.log
+
+  SUT_PAUSE_BEFORE_DURATION: 0
+  SUT_PAUSE_DURATION: 0

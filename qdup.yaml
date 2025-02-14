@@ -1,0 +1,39 @@
+hosts:
+  sut-host: ${{SUT_SERVER}}
+  driver-host: ${{LOAD_DRIVER_SERVER}}
+
+roles:
+  sut:
+    hosts:
+    - sut-host
+    setup-scripts:
+    - setup-sut
+    run-scripts:
+    - pause-sut
+    cleanup-scripts:
+    - cleanup-sut
+  
+  load:
+    hosts:
+    - driver-host
+    setup-scripts:
+    - setup-driver
+    run-scripts:
+    - run-benchmark
+    cleanup-scripts:
+    - parse-metrics
+    - cleanup-driver
+
+states:
+  SUT_SERVER: LOCAL
+  LOAD_DRIVER_SERVER: LOCAL
+
+  # overall duration of the test in seconds
+  TARGET_PROTOCOL: http
+  TARGET_HOST: localhost
+  TARGET_PORT: 8080
+  TARGET_ENDPOINT: time/cached
+
+  RATE: 100
+  DURATION: 40
+  VUS: 10

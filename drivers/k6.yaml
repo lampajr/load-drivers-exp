@@ -1,0 +1,46 @@
+
+
+scripts:
+  setup-driver:
+  - script: install-k6
+  - sh: if [ -f /tmp/${{K6_CONFIG}} ]; then rm -f /tmp/${{K6_CONFIG}}; fi
+  - upload: ${{ENV.SCRIPT_DIR}}/assets/${{K6_CONFIG}} /tmp
+  - sh: sed -i -e "s|duration:'40s'|duration:'${{K6_DURATION}}s'|g" /tmp/${{K6_CONFIG}}
+  - sh: sed -i -e "s|rate:300|rate:${{K6_RATE}}|g" /tmp/${{K6_CONFIG}}
+  # - sh: sed -i -e "s|preAllocatedVUs:2|preAllocatedVUs:${{K6_VUS}}|g" /tmp/${{K6_CONFIG}}
+  - sh: sed -i -e "s|maxVUs:30|maxVUs:${{K6_VUS}}|g" /tmp/${{K6_CONFIG}}
+  - sh: sed -i -e "s|#FULL_URL_REPLACE_ME#|${{= escapeSlash("${{K6_ENDPOINT}}")}}|g" /tmp/${{K6_CONFIG}}
+  - queue-download: /tmp/${{K6_CONFIG}}
+
+  run-benchmark:
+  - sh: if [ -f ${{K6_OUT}} ]; then rm -f ${{K6_OUT}}; fi
+  - queue-download: ${{K6_OUT}}
+  - queue-download: ${{K6_LOG}}
+  - log: running k6 benchmark..
+  - signal: BENCHMARK_STARTED
+  - sh: k6 run --summary-trend-stats="avg,min,med,max,p(50),p(75),p(90),p(99),p(99.9),p(99.99),p(99.999),count" --out json=${{K6_OUT}} /tmp/${{K6_CONFIG}} &> ${{K6_LOG}}
+  - signal: BENCHMARK_TERMINATED
+
+  parse-metrics:
+  - log: not yet implemented
+
+  cleanup-driver:
+  - sh: rm -rf ${{K6_OUT}} ${{K6_LOG}} /tmp/${{K6_CONFIG}}
+
+  install-k6:
+  - sh: k6 --version
+  - regex: ".*command not found"
+    then:
+    - log: k6 installation not yet implemented
+    else:
+    - log: k6 already installed!
+
+states:
+  K6_ENDPOINT: ${{TARGET_PROTOCOL}}://${{TARGET_HOST}}:${{TARGET_PORT}}/${{TARGET_ENDPOINT}}
+
+  K6_CONFIG: k6-config.js
+  K6_RATE: ${{RATE}}
+  K6_VUS: ${{VUS}}
+  K6_DURATION: ${{DURATION}}
+  K6_OUT: /tmp/k6_run.json
+  K6_LOG: /tmp/k6_log.log
