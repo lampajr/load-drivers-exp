@@ -24,8 +24,8 @@ states:
   HF_ENDPOINT: ${{TARGET_PROTOCOL}}://${{TARGET_HOST}}:${{TARGET_PORT}}/${{TARGET_ENDPOINT}}
 
   HF_RATE: ${{RATE}}
-  HF_THREADS: 5
-  HF_CONNECTIONS: ${{VUS}}
+  HF_THREADS: ${{VUS}}
+  HF_CONNECTIONS: ${{CONNECTIONS}}
   HF_DURATION: ${{DURATION}}
   HF_LOG: /tmp/hyperfoil/hyperfoil.local.log
   HF_OUT: /tmp/hyperfoil_run.log

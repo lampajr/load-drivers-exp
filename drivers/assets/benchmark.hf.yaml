@@ -1,0 +1,25 @@
+name: get-time
+http:
+  - protocol: !param SERVICE_PROTOCOL http
+    host: !param SERVICE_HOST localhost
+    port: !param SERVICE_PORT 8080
+    sharedConnections: !param SHARED_CONNECTIONS 10
+    useHttpCache: false
+
+ergonomics:
+  stopOnInvalid: false
+  autoRangeCheck: true
+  repeatCookies: false
+phases:
+  - getTime:
+      constantRate:
+        usersPerSec: !param USERS_PER_SEC 100
+        maxSessions: !param MAX_SESSIONS 10
+        duration: !param DURATION 60s
+        variance: false
+        scenario:
+          - getCachedTime:
+              - httpRequest:
+                  GET: !param ENDPOINT
+                  headers:
+                    accept: application/json

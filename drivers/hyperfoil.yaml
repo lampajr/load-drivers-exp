@@ -1,0 +1,39 @@
+# Template for a driver
+scripts:
+  setup-driver:
+  - script: sdk-select-jbang
+  - sh: if [ -f /tmp/${{HF_BENCHMARK}} ]; then rm -f /tmp/${{HF_BENCHMARK}}; fi
+  - upload: ${{ENV.SCRIPT_DIR}}/assets/${{HF_BENCHMARK}} /tmp
+  - queue-download: /tmp/${{HF_BENCHMARK}}
+
+  run-benchmark:
+  - sh: if [ -f ${{HF_LOG}} ]; then rm -f ${{HF_LOG}}; fi
+  - sh: if [ -f ${{HF_OUT}} ]; then rm -f ${{HF_OUT}}; fi
+  - queue-download: ${{HF_LOG}}
+  - queue-download: ${{HF_OUT}}
+  - log: running hyperfoil benchmark..
+  - sh: jbang run@hyperfoil -o ${{HF_OUT}} /tmp/${{HF_BENCHMARK}} -PSERVICE_HOST=${{TARGET_HOST}} -PSERVICE_PORT=${{TARGET_PORT}} -PDURATION=${{DURATION}} -PUSERS_PER_SEC=${{RATE}} -PMAX_SESSIONS=${{VUS}} -PSHARED_CONNECTIONS=${{CONNECTIONS}} -PENDPOINT=/${{TARGET_ENDPOINT}}
+    watch:
+    - regex: 
+        pattern: Started run (?<RUN.HF_RUN_ID>.*{4})
+        autoConvert: false 
+      then:
+      - signal: HF_BENCHMARK_STARTED
+  - signal: BENCHMARK_TERMINATED
+  - queue-download: /tmp/hyperfoil/run/${{HF_RUN_ID}}/all.json
+
+  parse-metrics:
+  - log: not yet implemented
+
+  cleanup-driver:
+  - sh: rm -f ${{HF_LOG}} ${{HF_OUT}}
+
+states:
+
+  HF_BENCHMARK: benchmark.hf.yaml
+  HF_RATE: ${{RATE}}
+  HF_THREADS: 5
+  HF_CONNECTIONS: ${{VUS}}
+  HF_DURATION: ${{DURATION}}
+  HF_LOG: /tmp/hyperfoil/hyperfoil.local.log
+  HF_OUT: /tmp/hyperfoil_report.html

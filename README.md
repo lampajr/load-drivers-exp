@@ -26,6 +26,7 @@ Available SUT (Server Under Test) implementations:
 - [sut](./sut/sut.yaml)
 
 Available load generators (driver):
+- [hyperfoil](./drivers/hyperfoil.yaml)
 - [hf wrk2](./drivers/hf-wrk2.yaml) (Hyperfoil wrk2 wrapper)
 - [jmeter](./drivers/jmeter.yaml)
 - [k6](./drivers/k6.yaml)
