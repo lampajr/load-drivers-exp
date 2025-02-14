@@ -1,0 +1,13 @@
+# Template for a driver
+scripts:
+  setup-driver:
+  - abort: Not yet implemented
+
+  run-benchmark:
+  - abort: Not yet implemented
+
+  parse-metrics:
+  - abort: Not yet implemented
+
+  cleanup-driver:
+  - abort: Not yet implemented

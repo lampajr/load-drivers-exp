@@ -1,41 +1,38 @@
 # Load Generators Comparison
 
-This repository aims to automate the execution of multiple load generators against the same server (simultaneously).
+This repository aims to automate the execution of multiple load generators against the same server.
+
+## Prerequisites
+
+The whole automation is implemented using [qDup](https://github.com/Hyperfoil/qDup), a tool that allows shell commands to be queued up across multiple servers to coordinate performance tests.
+
+Its execution is performed using [jbang](https://www.jbang.dev/documentation/guide/latest/), therefore the main prerequisite is this one.
+
+Then, in according to which load generator you'd like to run, you should take care of installing the appropriate tool and make it available.
+
+
+> [!NOTE]
+> I am planning to automate the installation of those tools as well, currently only Hyperfoil and JBang installation as automated (if not already existing)
 
 ## Usage
 
 If you want to run the complete automated test, simply run:
 
 ```bash
-./scripts/run-benchmarks.sh
+./run.sh [sut] [driver] [additional args]
 ```
 
-You can also skip some load generators:
-```bash
-ARTILLERY_ENABLED=false K6_ENABLED=false HF_ENABLED=true JMETER_ENABLED=true ./run-benchmarks.sh
-```
+Available SUT (Server Under Test) implementations:
+- [sut](./sut/sut.yaml)
+
+Available load generators (driver):
+- [hf wrk2](./drivers/hf-wrk2.yaml) (Hyperfoil wrk2 wrapper)
+- [jmeter](./drivers/jmeter.yaml)
+- [k6](./drivers/k6.yaml)
 
 > [!NOTE]
-> You need to satisfy all [prerequisites](#prerequisites), otherwise the script might fail.
+> Consider running `./run.sh help` for some examples and usages.
 
-Alternatively you can simply startup the server by running:
-```bash
-./scripts/start-server.sh
-```
-
-And then run you own tests.
-
-## Prerequisites
-
-To run `run-benchmarks` script you need to ensure all load generators listed below are installed or present in your local system.
-
-Keep in mind that you can override the executable as you prefer, see the [run-benchmarks](./scripts/run-benchmarks.sh) overridable configuration.
-
-## Server
-
-For the sake of simplicity, the server is a minimal Quarkus based web application.
-
-Checkout https://github.com/franz1981/quarkus-profiling-workshop for more information.
 
 ## Load Generators
 
@@ -53,14 +50,17 @@ The Apache JMeter™ application is a pure Java application designed to load tes
 
 Checkout https://jmeter.apache.org/ for more details and how to install/download it.
 
-### Artillery
-
-Artillery is an open source load testing platform.
-
-Checkout https://www.artillery.io/ for more details and how to install/download it.
-
 ### K6
 
 An extensible load testing tool.
 
 Checkout https://k6.io/open-source/ for more details and how to install/download it.
+
+### Artillery
+
+> [!NOTE]
+> Not yet integrated!
+
+Artillery is an open source load testing platform.
+
+Checkout https://www.artillery.io/ for more details and how to install/download it.

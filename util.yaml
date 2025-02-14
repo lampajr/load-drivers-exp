@@ -1,0 +1,46 @@
+
+globals:
+  javascript: |
+    function escapeSlash(val){
+      return val.replace("/", "\\/")
+    }
+    
+scripts:
+  install-sdkman: #https://sdkman.io/install
+  - sh:
+      command: sdk help
+      silent: true
+      prompt:
+        "Would you like to upgrade now? (Y/n): ": "Y"
+  - regex: ".*command not found"
+    then:
+    - sh: curl -s "https://get.sdkman.io" | bash
+      then:
+      - regex: "Enjoy"
+        else:
+        - abort: failed to install SDKMAN
+    - sh: source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sh:
+      command: sdk version
+      prompt:
+        "Would you like to upgrade now? (Y/n): ": "Y"
+    then:
+    - regex: "SDKMAN (?<RUN.sdk_version>[\\d\\.\\+]+)"
+  
+  sdk-select-java:
+  - script: install-sdkman
+  - sh:
+      command: sdk install java ${{JAVA_VERSION:21.0.5-tem}}
+      prompt:
+        "set as default? (Y/n): ": "Y"
+  - sh:
+      command: sdk use java ${{JAVA_VERSION:21.0.5-tem}}
+
+  sdk-select-jbang:
+  - script: install-sdkman
+  - sh:
+      command: sdk install jbang ${{JBANG_VERSION:0.121.0}}
+      prompt:
+        "set as default? (Y/n): ": "Y"
+  - sh:
+      command: sdk use jbang ${{JBANG_VERSION:0.121.0}}

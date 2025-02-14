@@ -1,0 +1,46 @@
+
+scripts:
+  setup-driver:
+  - script: install-jmeter
+  - sh: if [ -f /tmp/${{JM_CONFIG}} ]; then rm -f /tmp/${{JM_CONFIG}}; fi
+  - upload: ${{ENV.SCRIPT_DIR}}/assets/${{JM_CONFIG}} /tmp
+  # TODO: user jmeter properties instead ??
+  - sh: sed -i -e 's/#HOST#/${{TARGET_HOST}}/g' /tmp/${{JM_CONFIG}}
+  - sh: sed -i -e 's/#PORT#/${{TARGET_PORT}}/g' /tmp/${{JM_CONFIG}}
+  - sh: sed -i -e 's/#ENDPOINT#/\/${{= escapeSlash("${{TARGET_ENDPOINT}}")}}/g' /tmp/${{JM_CONFIG}}
+  - sh: sed -i -e 's/rate(300\/sec)/rate(${{JM_RATE}}\/sec)/g' /tmp/${{JM_CONFIG}}
+  - sh: sed -i -e 's/random_arrivals(40 sec)/random_arrivals(${{JM_DURATION}} sec)/g' /tmp/${{JM_CONFIG}}
+  - queue-download: /tmp/${{JM_CONFIG}}
+
+  run-benchmark:
+  - sh: if [ -f ${{JM_OUT}} ]; then rm -f ${{JM_OUT}}; fi
+  - queue-download: ${{JM_OUT}}
+  - queue-download: ${{JM_LOG}}
+  - queue-download: ${{JM_REPORT}}/statistics.json
+  - log: running jmeter benchmark..
+  - signal: BENCHMARK_STARTED
+  - sh: jmeter -n -t /tmp/${{JM_CONFIG}} -l ${{JM_OUT}} -j ${{JM_LOG}} -o ${{JM_REPORT}} ${{JM_PARAMS:}}
+  - signal: BENCHMARK_TERMINATED
+
+  parse-metrics:
+  - log: not yet implemented
+
+  cleanup-driver:
+  - log: not yet implemented
+
+  install-jmeter:
+  - sh: jmeter --version
+  - regex: ".*command not found"
+    then:
+    - log: jmeter installation not yet implemented
+    else:
+    - log: jmeter already installed!
+
+states:
+  JM_CONFIG: jmeter-config.jmx
+  JM_RATE: ${{RATE}}
+  JM_DURATION: ${{DURATION}}
+  JM_OUT: /tmp/jmeter_run.jtl
+  JM_LOG: /tmp/jmeter_log.log
+  JM_REPORT: /tmp/jmeter_report
+  JM_PARAMS: -f -e
