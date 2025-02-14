@@ -66,7 +66,7 @@ scripts:
 
 states:
   SUT_REPO: https://github.com/franz1981/quarkus-profiling-workshop.git
-  SUT_COMMIT: master
+  SUT_COMMIT: 68ab1577186e768b8017e11b1c4257ce747f6e5b
   SUT_BUILD_FOLDER: /tmp/build-quarkus-profiling-workshop
   SUT_BUILD_LOG: /tmp/sut_build.log
 
