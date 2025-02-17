@@ -30,6 +30,7 @@ Available load generators (driver):
 - [hf wrk2](./drivers/hf-wrk2.yaml) (Hyperfoil wrk2 wrapper)
 - [jmeter](./drivers/jmeter.yaml)
 - [k6](./drivers/k6.yaml)
+- [wrk2](./drivers/wrk2.yaml)
 
 > [!NOTE]
 > Consider running `./run.sh help` for some examples and usages.
@@ -56,6 +57,12 @@ Checkout https://jmeter.apache.org/ for more details and how to install/download
 An extensible load testing tool.
 
 Checkout https://k6.io/open-source/ for more details and how to install/download it.
+
+### WRK2
+
+A HTTP benchmarking tool based mostly on wrk. wrk2 is wrk modified to produce a constant throughput load, and accurate latency details to the high 9s.
+
+Checkout https://github.com/giltene/wrk2 for more details and how to install/download it.
 
 ### Artillery
 

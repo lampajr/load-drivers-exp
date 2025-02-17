@@ -1,0 +1,37 @@
+# Template for a driver
+scripts:
+  setup-driver:
+  - script: install-wrk2
+
+  run-benchmark:
+  - sh: if [ -f ${{WRK2_OUT}} ]; then rm -f ${{WRK2_OUT}}; fi
+  - queue-download: ${{WRK2_OUT}}
+  - log: running wrk2 benchmark..
+  - signal: BENCHMARK_STARTED
+  - sh: wrk2 -R ${{WRK2_RATE}} -c ${{WRK2_CONNECTIONS}} -t ${{WRK2_THREADS}} -d ${{WRK2_DURATION}} --latency ${{WRK2_ENDPOINT}} > ${{WRK2_OUT}}
+  - signal: BENCHMARK_TERMINATED
+
+  parse-metrics:
+  - log: not yet implemented
+
+  cleanup-driver:
+  - sh: rm -f ${{WRK2_OUT}}
+  
+  install-wrk2:
+  - sh: 
+      command: wrk2 --version
+      ignore-exit-code: true
+  - regex: ".*command not found"
+    then:
+    - log: k6 installation not yet implemented
+    else:
+    - log: k6 already installed!
+
+states:
+  WRK2_ENDPOINT: ${{TARGET_PROTOCOL}}://${{TARGET_HOST}}:${{TARGET_PORT}}/${{TARGET_ENDPOINT}}
+
+  WRK2_RATE: ${{RATE}}
+  WRK2_THREADS: ${{VUS}}
+  WRK2_CONNECTIONS: ${{CONNECTIONS}}
+  WRK2_DURATION: ${{DURATION}}
+  WRK2_OUT: /tmp/wrk2_run.log
