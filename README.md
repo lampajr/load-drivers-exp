@@ -23,7 +23,7 @@ If you want to run the complete automated test, simply run:
 ```
 
 Available SUT (Server Under Test) implementations:
-- [sut](./sut/sut.yaml)
+- [sut](./sut/sut.yaml) - simple server taken from https://github.com/franz1981/quarkus-profiling-workshop 
 
 Available load generators (driver):
 - [hyperfoil](./drivers/hyperfoil.yaml)
@@ -31,6 +31,7 @@ Available load generators (driver):
 - [jmeter](./drivers/jmeter.yaml)
 - [k6](./drivers/k6.yaml)
 - [wrk2](./drivers/wrk2.yaml)
+- [artillery](./drivers/artillery.yaml)
 
 > [!NOTE]
 > Consider running `./run.sh help` for some examples and usages.
@@ -65,9 +66,6 @@ A HTTP benchmarking tool based mostly on wrk. wrk2 is wrk modified to produce a 
 Checkout https://github.com/giltene/wrk2 for more details and how to install/download it.
 
 ### Artillery
-
-> [!NOTE]
-> Not yet integrated!
 
 Artillery is an open source load testing platform.
 

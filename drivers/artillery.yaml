@@ -1,0 +1,48 @@
+
+scripts:
+  setup-driver:
+  - script: install-artillery
+  - sh: if [ -f /tmp/${{ART_CONFIG}} ]; then rm -f /tmp/${{ART_CONFIG}}; fi
+  - upload: ${{ENV.SCRIPT_DIR}}/assets/${{ART_CONFIG}} /tmp
+  # TODO: use --overrides from artillery run command
+  - sh: sed -i -e 's|#HOST#|${{ART_HOST}}|g' /tmp/${{ART_CONFIG}}
+  - sh: sed -i -e 's/#PORT#/${{TARGET_PORT}}/g' /tmp/${{ART_CONFIG}}
+  - sh: sed -i -e 's/#ENDPOINT#/\/${{= escapeSlash("${{TARGET_ENDPOINT}}")}}/g' /tmp/${{ART_CONFIG}}
+  - sh: sed -i -e 's/#DURATION#/${{ART_DURATION}}/g' /tmp/${{ART_CONFIG}}
+  - sh: sed -i -e 's/#ARRIVAL_RATE#/${{ART_RATE}}/g' /tmp/${{ART_CONFIG}}
+  - sh: sed -i -e 's/#VUS#/${{VUS}}/g' /tmp/${{ART_CONFIG}}
+  - queue-download: /tmp/${{ART_CONFIG}}
+
+  run-benchmark:
+  # - sh: if [ -f ${{ART_OUT}} ]; then rm -f ${{ART_OUT}}; fi
+  - sh: if [ -f ${{ART_LOG}} ]; then rm -f ${{ART_LOG}}; fi
+  # - queue-download: ${{ART_OUT}}
+  - queue-download: ${{ART_LOG}}
+  - log: running artillery benchmark..
+  - signal: BENCHMARK_STARTED
+  - sh: artillery run /tmp/${{ART_CONFIG}} > ${{ART_LOG}}
+  - signal: BENCHMARK_TERMINATED
+
+  parse-metrics:
+  - log: not yet implemented
+
+  cleanup-driver:
+  - log: not yet implemented
+
+  install-artillery:
+  - sh: artillery --version
+  - regex: ".*command not found"
+    then:
+    - log: artillery installation not yet implemented
+    else:
+    - log: artillery already installed!
+
+states:
+  ART_HOST: ${{TARGET_PROTOCOL}}://${{TARGET_HOST}}:${{TARGET_PORT}}
+
+  ART_CONFIG: artillery-config.yaml
+  ART_RATE: ${{RATE}}
+  ART_DURATION: ${{DURATION}}
+  ART_OUT: /tmp/jmeter_run.jtl
+  ART_LOG: /tmp/artillery_log.log
+  ART_REPORT: /tmp/jmeter_report

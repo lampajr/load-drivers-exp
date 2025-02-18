@@ -1,0 +1,10 @@
+config:
+  target: "#HOST#"
+  phases:
+    - duration: #DURATION#
+      arrivalRate: #ARRIVAL_RATE#
+      maxVusers: #VUS#
+scenarios:
+  - flow:
+      - get:
+          url: "#ENDPOINT#"
