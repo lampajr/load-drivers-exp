@@ -16,6 +16,7 @@ phases:
         usersPerSec: !param USERS_PER_SEC 100
         maxSessions: !param MAX_SESSIONS 10
         duration: !param DURATION 60s
+        maxDuration: !param MAX_DURATION 60s
         variance: false
         scenario:
           - getCachedTime:

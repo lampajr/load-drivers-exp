@@ -12,7 +12,7 @@ scripts:
   - queue-download: ${{HF_LOG}}
   - queue-download: ${{HF_OUT}}
   - log: running hyperfoil benchmark..
-  - sh: jbang run@hyperfoil -o ${{HF_OUT}} /tmp/${{HF_BENCHMARK}} -PSERVICE_HOST=${{TARGET_HOST}} -PSERVICE_PORT=${{TARGET_PORT}} -PDURATION=${{DURATION}} -PUSERS_PER_SEC=${{RATE}} -PMAX_SESSIONS=${{VUS}} -PSHARED_CONNECTIONS=${{CONNECTIONS}} -PENDPOINT=/${{TARGET_ENDPOINT}}
+  - sh: jbang run@hyperfoil -o ${{HF_OUT}} /tmp/${{HF_BENCHMARK}} -PSERVICE_HOST=${{TARGET_HOST}} -PSERVICE_PORT=${{TARGET_PORT}} -PDURATION=${{DURATION}} -PMAX_DURATION=${{DURATION}} -PUSERS_PER_SEC=${{RATE}} -PMAX_SESSIONS=${{VUS}} -PSHARED_CONNECTIONS=${{CONNECTIONS}} -PENDPOINT=/${{TARGET_ENDPOINT}}
     watch:
     - regex: 
         pattern: Started run (?<RUN.HF_RUN_ID>.*{4})
