@@ -6,6 +6,15 @@ globals:
     }
     
 scripts:
+  # Tooling for Java version mgmt
+  install-sw-mgmt-tool:
+  - js: ${{USE_SDKMAN}}
+    then:
+    - script: install-sdkman
+    else:
+    - script: install-mise
+
+  # SDKMAN
   install-sdkman: #https://sdkman.io/install
   - sh:
       command: sdk help
@@ -26,21 +35,48 @@ scripts:
         "Would you like to upgrade now? (Y/n): ": "Y"
     then:
     - regex: "SDKMAN (?<RUN.sdk_version>[\\d\\.\\+]+)"
+
+  # MISE
+  install-mise: #https://mise.jdx.dev/getting-started.html
+    - sh:
+        command: mise help
+        silent: true
+        ignore-exit-code: true
+    - regex: ".*command not found"
+      then:
+      - sh: curl https://mise.run | sh
+        then:
+        - regex: "installed successfully"
+          else:
+          - abort: failed to install Mise
   
   sdk-select-java:
-  - script: install-sdkman
-  - sh:
-      command: sdk install java ${{JAVA_VERSION:21.0.5-tem}}
-      prompt:
-        "set as default? (Y/n): ": "Y"
-  - sh:
-      command: sdk use java ${{JAVA_VERSION:21.0.5-tem}}
+  - script: install-sw-mgmt-tool
+  - js: ${{USE_SDKMAN}}
+    then:
+    - sh:
+        command: sdk install java ${{JAVA_VERSION:21.0.5-tem}}
+        prompt:
+          "set as default? (Y/n): ": "Y"
+    - sh:
+        command: sdk use java ${{JAVA_VERSION:21.0.5-tem}}
+    else:
+    - sh: mise use -g java@${{JAVA_VERSION:temurin-21.0.5+11.0.LTS}}
+  # mainly for debugging purposes
+  - sh: java -version
 
   sdk-select-jbang:
-  - script: install-sdkman
-  - sh:
-      command: sdk install jbang ${{JBANG_VERSION:0.121.0}}
-      prompt:
-        "set as default? (Y/n): ": "Y"
-  - sh:
-      command: sdk use jbang ${{JBANG_VERSION:0.121.0}}
+  - script: install-sw-mgmt-tool
+  - js: ${{USE_SDKMAN}}
+    then:
+    - sh:
+        command: sdk install jbang ${{JBANG_VERSION:0.121.0}}
+        prompt:
+          "set as default? (Y/n): ": "Y"
+    - sh:
+        command: sdk use jbang ${{JBANG_VERSION:0.121.0}}
+    else:
+    - sh: mise use -g jbang@${{JBANG_VERSION:0.125.1}}
+
+states:
+  USE_SDKMAN: false

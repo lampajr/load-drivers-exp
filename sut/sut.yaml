@@ -71,7 +71,7 @@ states:
   SUT_BUILD_LOG: /tmp/sut_build.log
 
   SUT_JAVA_OPTIONS: -Djava.net.preferIPv4Stack=true -Dquarkus.log.level=INFO -Dquarkus.vertx.event-loops-pool-size=10 -Dquarkus.http.idle-timeout=30M -Dquarkus.http.accept-backlog=-1 -Dquarkus.http.limits.max-connections=100 -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints
-  SUT_JAVA_VERSION: 21.0.5-tem
+  SUT_JAVA_VERSION: temurin-21.0.5+11.0.LTS
 
   SUT_RUN_LOG: /tmp/sut_run.log
 
